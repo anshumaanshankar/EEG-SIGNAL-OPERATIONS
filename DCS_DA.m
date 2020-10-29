@@ -3,20 +3,20 @@ clear all
 close all
 f0=150; % cutoff frequency
 Q=35; % Q factor 
-[y, t, freqint] = plotATM('Subject00_1_edfm'); %reading the input EEG, the signal is stored in y
+[out, t, freqint] = plotATM('Subject00_1_edfm'); %reading the input EEG, the signal is stored in y
 Fs = freqint(1); %sampling frequency that is stored in freqint is moved to Fs
 figure()
 subplot(3,1,1) 
-plot(t,y,'b') %plotting the input signal with respect to time 
+plot(t,out,'b') %plotting the input EEG signal with respect to time 
 xlabel('time(s)')
 ylabel('amplitude(uV)')
 title('EEG pattern')
 
 %QUANTISATION 
-outmin=min(y) %calculating the minimum value of the signal 
-outmax=max(y) %calculating the maximum value of the signal
+outmin=min(out) %calculating the minimum value of the signal 
+outmax=max(out) %calculating the maximum value of the signal
 num=500 %quantization levels
-quantized=y/outmax(1)
+quantized=out/outmax(1)
 delta=(outmax-outmin)/num %step size calculation
 delta=delta(1)
 q=delta.*[0:num-1]
@@ -39,7 +39,7 @@ ylabel('amplitude(uV)')
 title('quantised waveform')
 figure()
 subplot(2,1,1)
-plot(t,y,'r', 'linewidth',1.5) % plotting zoomed input signal
+plot(t,out,'r', 'linewidth',1.5) % plotting zoomed input signal
 axis([0.2 0.8 -50 50]) % setting axis values to show zoomed region
 title('Original EEG pattern')
 xlabel('Time(s)')
