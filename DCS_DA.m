@@ -3,37 +3,37 @@ clear all
 close all
 f0=150; % cutoff frequency
 Q=35; % Q factor 
-[y, t, freqint] = plotATM('Subject00_1_edfm'); % reading the input EEG, the signal is stored in y
-Fs = freqint(1); % sampling frequency that is stored in freqint is moved to Fs
+[y, t, freqint] = plotATM('Subject00_1_edfm'); %reading the input EEG, the signal is stored in y
+Fs = freqint(1); %sampling frequency that is stored in freqint is moved to Fs
 figure()
 subplot(3,1,1) 
-plot(t,y,'b') % plotting the input signal with respect to time 
+plot(t,y,'b') %plotting the input signal with respect to time 
 xlabel('time(s)')
 ylabel('amplitude(uV)')
 title('EEG pattern')
 
-% QUANTISATION 
-outmin=min(y) % calculating the minimum value of the signal 
-outmax=max(y) % calculating the maximum value of the signal
-num=500 % quantization levels
-yquan=y/outmax(1)
-delta=(outmax-outmin)/num % step size calculation
+%QUANTISATION 
+outmin=min(y) %calculating the minimum value of the signal 
+outmax=max(y) %calculating the maximum value of the signal
+num=500 %quantization levels
+quantized=y/outmax(1)
+delta=(outmax-outmin)/num %step size calculation
 delta=delta(1)
 q=delta.*[0:num-1]
 q=q-((num-1)/2)*delta
 
 subplot(3,1,2)
-stem(q) % displaying the quantization levels 
+stem(q) %displaying the quantization levels 
 xlabel('time(s)')
 ylabel('Amplitude(uV)')
 title('Quantisation Levels')
-% loop for quantizing the wave by rounding off values to nearest quantization value
+%quantizing the wave by rounding off values to nearest quantization value
 for x=1:num
-yquan(find((q(x)-delta/2<=yquan)&(yquan<=q(x)+delta/2)))=q(x).*ones(1,length(find((q(x)-delta/2<=yquan)&(yquan<=q(x)+delta/2)))) 
-bquan(find(yquan==q(x)))=(x-1).*ones(1,length(find(yquan==q(x))))
+quantized(find((q(x)-delta/2<=quantized)&(quantized<=q(x)+delta/2)))=q(x).*ones(1,length(find((q(x)-delta/2<=quantized)&(quantized<=q(x)+delta/2)))) 
+bquan(find(quantized==q(x)))=(x-1).*ones(1,length(find(quantized==q(x))))
 end
 subplot(3,1,3)
-plot(t,yquan, 'b') % displaying the quantized output wave
+plot(t,quantized, 'b') %displaying the quantized output wave
 xlabel('time(s)')
 ylabel('amplitude(uV)')
 title('quantised waveform')
@@ -46,17 +46,17 @@ xlabel('Time(s)')
 ylabel('Amplitude (uV)')
 
 subplot(2,1,2)
-plot(t,yquan,'r','linewidth',1.5) % Corresponding Zoomed output to show the quantised output clearly
-axis([0.2 0.8 -1 1]) % Axis setting in order to display zoomed output region
+plot(t,quantized,'r','linewidth',1.5) %Corresponding Zoomed output to show the quantised output clearly
+axis([0.2 0.8 -1 1]) %Axis setting in order to display zoomed output region
 title('Quantized EEG pattern')
 xlabel('Time(s)')
 ylabel('Amplitude (uV)')
 
-% DIGITISATION OF THE QUANTISED SIGNAL
-n1=8;  % number of bits per sample
+%DIGITISATION OF THE QUANTISED SIGNAL
+n1=8; %number of bits per sample
 partition=outmin:delta:outmax;			% quantisation lines definition
 codebook=outmin-(delta/2):delta:outmax+(delta/2);    % number of quantisation levels
-[index,quants]=quantiz(yquan,partition,codebook);
+[index,quants]=quantiz(quantized,partition,codebook);
 l1=length(index); % decreasing the number of indices for one, for digitisation
 convert=de2bi(index,'left-msb') 	% conversion from decimal to binary in order to perform digitisation
 k=1;
@@ -77,7 +77,7 @@ xlabel('time(s)');
 ylabel('amplitude(uV)');
 hold off;
 
-% RECONSTRUCTION OF QUANTISED SIGNAL FROM THE CONVERTED SIGNAL
+%RECONSTRUCTION OF QUANTISED SIGNAL FROM THE CONVERTED SIGNAL
 back=reshape(converted,n1,(length(converted)/n1));
 index1=bi2de(back,'left-msb'); % conversion of binary values back into decimal
 resignal=delta*index+outmin+(delta/2); % reconstructing the original signal using the quantised values
@@ -90,3 +90,4 @@ title('DEMODULATED SIGNAL');
 xlabel('Time(s)');
 ylabel('Amplitude (uV)');
 hold off;
+
